@@ -10,6 +10,7 @@ let score = 0;
 
 let currTile;
 let othTail;
+let initialX, initialY, currentX, currentY;
 
 
 window.onload = function(){
@@ -43,6 +44,11 @@ function startGame(){
            tile.addEventListener("dragend",dragEnd);
           tile.addEventListener("drop",dragDrop);
 
+          tile.addEventListener("touchstart", touchStart);
+          tile.addEventListener("touchmove", touchMove);
+          tile.addEventListener("touchend", touchEnd);
+
+
 
           boards.appendChild(tile);
           row.push(tile)
@@ -50,6 +56,42 @@ function startGame(){
         board.push(row);
     }
     console.log(board);
+}
+
+function touchStart(event) {
+    event.preventDefault();
+    currTile = event.targetTouches[0].target;
+    initialX = event.touches[0].clientX;
+    initialY = event.touches[0].clientY;
+}
+
+function touchMove(event) {
+    event.preventDefault();
+    if (!currTile) return;
+
+    currentX = event.touches[0].clientX;
+    currentY = event.touches[0].clientY;
+
+    let deltaX = currentX - initialX;
+    let deltaY = currentY - initialY;
+
+    currTile.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+}
+
+function touchEnd(event) {
+    event.preventDefault();
+    if (!currTile) return;
+
+    currTile.style.transform = '';
+
+    let element = document.elementFromPoint(currentX, currentY);
+    if (element && element !== currTile && element.tagName === 'IMG') {
+        othTail = element;
+
+        dragEnd();
+    }
+
+    currTile = null;
 }
 
 
